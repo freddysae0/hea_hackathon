@@ -1,0 +1,27 @@
+data:
+  raw: "data/raw"
+  processed: "data/processed"
+  interim: "data/interim"
+  target_col: "sick_onset" # Update based on actual data
+  index_time_col: "year"   # Update based on actual data
+  id_col: "person_id"
+
+model:
+  type: "lightgbm" # or xgboost, catboost
+  params:
+    objective: "binary"
+    metric: "auc"
+    learning_rate: 0.05
+    num_leaves: 31
+    feature_fraction: 0.8
+    bagging_fraction: 0.8
+    bagging_freq: 5
+    seed: 42
+
+training:
+  cv_folds: 5
+  cv_strategy: "group_kfold" # crucial for longitudinal
+  optimize_f2: true
+  
+reports:
+  output_dir: "reports"
