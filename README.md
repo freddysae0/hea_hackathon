@@ -33,3 +33,34 @@
 ## Reports
 - [Model Card](reports/model_card.md)
 - [Leakage Audit](reports/leakage_report.md)
+
+## Evaluation Criteria
+
+```mermaid
+mindmap
+  root((Hackathon Evaluation))
+    Primary Metrics 60%
+      F2-Score
+        (Recall prioritized)
+      PR-AUC
+        (Imbalanced data handling)
+      ROC-AUC
+        (Industry benchmark)
+    Additional Criteria 40%
+      No Data Leakage
+        (No future information)
+      Real-World Usability
+        (Handles noisy/missing data)
+      Cost Efficiency
+        (Lightweight & fast)
+      Open Source Only
+        (Reproducible, no black boxes)
+      Explainability
+        (Why high risk?)
+      Fairness
+        (No bias by age/sex/race)
+    Bonus Points
+      Novel Feature Engineering
+      Non-obvious Correlations
+      Production-Ready Code
+```
