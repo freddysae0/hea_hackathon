@@ -10,3 +10,7 @@ seaborn
 pyarrow
 pyyaml
 tqdm
+fastapi
+uvicorn
+pydantic
+python-multipart
