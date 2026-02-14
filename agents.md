@@ -71,3 +71,11 @@ To connect a new or improved model:
 4.  **Verification**: Check logs for "Loading model from models/model.pkl" to confirm successful loading.
 
 If `models/model.pkl` is missing, the agent gracefully downgrades to "Mock/Heuristic Mode" using rule-based logic to ensure the API remains functional for frontend development.
+
+## Evaluation Criteria Alignment
+
+The design of this agent prioritizes the hackathon's core evaluation metrics:
+*   **F2-Score Focus**: The model architecture is chosen to maximize recall (catching potential sick cases) even at the cost of some precision.
+*   **Explainability**: The agent provides `top_factors` with every prediction, directly addressing the explainability requirement.
+*   **Real-World Usability**: The API accepts raw user inputs (strings) and handles conversion/imputation (`_preprocess` method), ensuring robustness against noisy data.
+*   **Fairness**: Feature engineering includes `sex` and `age` to allow for fairness auditing, though the model aims to use them for risk adjustment rather than discrimination.
