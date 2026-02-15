@@ -23,9 +23,16 @@ class HealthRiskAgent:
         "arthre": 0.0375,
     }
 
-    def __init__(self, model_path: str = "models/model.pkl") -> None:
+    def __init__(
+        self,
+        model_path: str = "models/model.pkl",
+        model_meta_path: str = "models/model_meta.pkl",
+    ) -> None:
         self.model_path = model_path
+        self.model_meta_path = model_meta_path
         self.model = self._load_model(model_path)
+        self.model_meta = self._load_model_meta(model_meta_path)
+        self.model_threshold = self._extract_model_threshold(self.model_meta)
 
     def _load_model(self, model_path: str) -> Optional[Any]:
         if not os.path.exists(model_path):
@@ -38,6 +45,32 @@ class HealthRiskAgent:
         except Exception as exc:
             logger.error("Failed to load model from %s: %s", model_path, exc)
             return None
+
+    def _load_model_meta(self, model_meta_path: str) -> Dict[str, Any]:
+        if not os.path.exists(model_meta_path):
+            logger.warning("Model metadata not found at %s. Using default threshold.", model_meta_path)
+            return {}
+
+        try:
+            meta = joblib.load(model_meta_path)
+            if isinstance(meta, dict):
+                return meta
+            logger.warning("Model metadata at %s is not a dict. Ignoring.", model_meta_path)
+            return {}
+        except Exception as exc:
+            logger.error("Failed to load model metadata from %s: %s", model_meta_path, exc)
+            return {}
+
+    @staticmethod
+    def _extract_model_threshold(meta: Dict[str, Any]) -> float:
+        if not isinstance(meta, dict):
+            return 0.33
+
+        value = meta.get("best_threshold_f2", 0.33)
+        try:
+            return float(np.clip(float(value), 0.01, 0.99))
+        except (TypeError, ValueError):
+            return 0.33
 
     @staticmethod
     def _to_float(value: Any) -> Optional[float]:
@@ -236,6 +269,15 @@ class HealthRiskAgent:
         return self._clip_probability(blended)
 
     def _risk_level(self, risk_score: float) -> str:
+        if self.model is not None:
+            high_cut = float(self.model_threshold)
+            medium_cut = max(0.10, high_cut * 0.60)
+            if risk_score >= high_cut:
+                return "High"
+            if risk_score >= medium_cut:
+                return "Medium"
+            return "Low"
+
         if risk_score >= 0.66:
             return "High"
         if risk_score >= 0.33:
@@ -462,7 +504,11 @@ class HealthRiskAgent:
             "disease_risks": disease_risks,
             "recommendations": recommendations,
             "missing_fields": metadata["missing_fields"],
-            "model_version": "model.pkl" if self.model is not None else "heuristic-v1",
+            "model_version": (
+                "model.pkl+meta"
+                if self.model is not None and bool(self.model_meta)
+                else ("model.pkl" if self.model is not None else "heuristic-v1")
+            ),
         }
 
         return result
@@ -473,4 +519,8 @@ class HealthRiskAgent:
             "thresholds": self.DISEASE_THRESHOLDS,
             "model_path": self.model_path,
             "model_loaded": self.model is not None,
+            "model_meta_path": self.model_meta_path,
+            "model_meta_loaded": bool(self.model_meta),
+            "model_threshold": float(self.model_threshold),
+            "training_metrics": self.model_meta.get("metrics", {}) if isinstance(self.model_meta, dict) else {},
         }
