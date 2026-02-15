@@ -84,3 +84,13 @@ We will measure how well your model predicts who will get sick using three metri
 
 #### Bonus Points
 We will award extra points for novel feature engineering, discovery of non-obvious correlations, and production-ready code quality.
+
+
+How to run the code:
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn src.api:app --reload --host 0.0.0.0 --port 8000
+
+```
