@@ -12,10 +12,17 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# Frontend integration: allow cross-origin calls during hackathon.
+# Frontend integration: explicit origins for production safety
+origins = [
+    "http://localhost:3000",
+    "http://localhost:8001",
+    "https://altair-hackathon.web.app",
+    "https://altair-hackathon.firebaseapp.com",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -54,9 +61,8 @@ class PredictionResult(BaseModel):
 class HealthFormValues(BaseModel):
     age: str
     sex: str
-    education_level: str
-    employment_status: str
-    marital_status: str
+    age: str
+    sex: str
     bmi: str
     systolic_bp: str
     diastolic_bp: str

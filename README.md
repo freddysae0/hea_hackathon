@@ -1,40 +1,69 @@
 # HEA Hackathon 2025 - Hidden Health Signals
 
-## Quick Start (3 commands to win)
+## Project Overview
+This project aims to detect early health risks using longitudinal data from the Health and Retirement Study (HRS). It features a robust **FastAPI backend** for predictions and a set of **Jupyter Notebooks** for deep data analysis.
 
-1. **Install dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+---
 
-2. **Run Pipeline**:
-   ```bash
-   # Preprocess data
-   python src/preprocess.py --config config.yaml
-   
-   # Train model (saves artifacts to models/)
-   python src/train.py --config config.yaml
-   
-   # Evaluate (generates reports)
-   python src/evaluate.py --config config.yaml
-   ```
+## 🚀 Quick Start: Data Analysis (Google Colab)
 
-3. **Predict**:
-   ```bash
-   python src/predict.py --input data/raw/test.csv --output data/processed/predictions.csv
-   ```
+To reproduce the analysis or run the feature extraction notebooks, you must set up the data in Google Drive.
 
-## Structure
-- `data/`: managed by `config.yaml`. Do not commit raw data.
-- `src/`: reproducible source code.
-- `reports/`: `leakage_report.md`, `fairness_report.md`, `model_card.md`.
-- `notebooks/`: `01_eda.ipynb` for initial exploration.
+### 1. Data Setup
+1.  Download the **HRS 2022 Fat File** (`h22e3a.csv`).
+2.  Upload it to your Google Drive in the root folder or a specific `data/raw/` folder.
+3.  Mount Drive in Colab when prompted by the notebooks.
 
-## Reports
-- [Model Card](reports/model_card.md)
-- [Leakage Audit](reports/leakage_report.md)
+### 2. Notebooks
+*   `notebooks/02_h22_analysis.ipynb`: **Data Integrity & Health Signals**. Checks if the file contains valid health/cognition data.
+*   `notebooks/03_advanced_correlations.ipynb`: **Cross-Domain Analysis**. Hunts for non-obvious correlations between lifestyle/demographics and chronic conditions.
 
-## Evaluation Criteria
+---
+
+## 🛠️ Local API Setup (Prediction Service)
+
+The prediction API runs locally using Docker or Python directly. It predicts health risks based on a user's self-reported data.
+
+### Option A: Docker (Recommended)
+This ensures all dependencies (including heavy ML libraries) are installed correctly.
+
+```bash
+docker-compose up --build
+```
+*   **API URL**: `http://localhost:8001`
+*   **Documentation**: `http://localhost:8001/docs`
+
+### Option B: Local Python
+Requires Python 3.11+.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn src.api:app --reload --host 0.0.0.0 --port 8001
+```
+
+### 🧪 Testing the API
+You can send a prediction request using `curl`:
+
+```bash
+curl -X POST "http://localhost:8001/predict" \
+     -H "Content-Type: application/json" \
+     -d '{
+           "age": "65",
+           "sex": "Male",
+           "bmi": "28.5",
+           "systolic_bp": "145",
+           "stress_level": 8,
+           "smoking_status": "Former",
+           "alcohol_frequency": "Weekly",
+           "physical_activity_days_per_week": "1"
+         }'
+```
+
+---
+
+## 🏆 Evaluation Criteria
 
 ```mermaid
 mindmap
@@ -65,32 +94,14 @@ mindmap
       Production-Ready Code
 ```
 
-### Detailed Evaluation Criteria
+### Detailed Criteria
 
 #### Primary Metrics (60% of score)
-We will measure how well your model predicts who will get sick using three metrics:
-
-*   **F2-Score**: Measures how well you catch people who will develop a disease. We prioritize recall over precision — missing a sick person is worse than a false alarm.
-*   **PR-AUC (Precision-Recall Area Under Curve)**: Shows how your model performs with imbalanced data. Most people in the dataset are healthy, and your model must handle that well.
-*   **ROC-AUC**: The industry standard metric that allows us to compare your solution with published benchmarks.
+*   **F2-Score**: Prioritize recall. Missing a sick person is worse than a false alarm.
+*   **PR-AUC**: Evaluation on imbalanced data.
+*   **ROC-AUC**: Industry benchmark.
 
 #### Additional Criteria (40% of score)
-*   **No Data Leakage**: Your model must not use features that already reveal the disease. For example, if someone takes medication for diabetes, they already have diabetes — that's cheating. We will audit your feature set.
-*   **Real-World Usability**: Your model will receive self-reported data from regular people, not clinical records. It must handle noisy, incomplete, and inconsistent inputs gracefully.
-*   **Cost Efficiency**: Simple beats expensive. A lightweight model that runs fast is better than an overengineered solution with costly API calls.
-*   **Open Source Only**: All tools, libraries, and data sources must be open and reproducible. No proprietary black boxes.
-*   **Explainability**: Can you explain why your model flagged someone as high-risk? Both users and doctors need to understand the reasoning.
-*   **Fairness**: Your model should not discriminate by age, gender, or ethnicity. We will check for bias.
-
-#### Bonus Points
-We will award extra points for novel feature engineering, discovery of non-obvious correlations, and production-ready code quality.
-
-
-How to run the code:
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-uvicorn src.api:app --reload --host 0.0.0.0 --port 8000
-
-```
+*   **No Data Leakage**: No use of features that reveal the target (e.g., medication use).
+*   **Real-World Usability**: Handle missing/noisy self-reported inputs.
+*   **Explainability**: The model must explain *why* a risk score is high (see `top_factors` in API response).
