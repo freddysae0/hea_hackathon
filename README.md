@@ -15,9 +15,7 @@ To reproduce the analysis or run the feature extraction notebooks, you must set 
 3.  Mount Drive in Colab when prompted by the notebooks.
 
 ### 2. Notebooks
-*   `notebooks/02_h22_analysis.ipynb`: **Data Integrity & Health Signals**. Checks if the file contains valid health/cognition data.
-*   `notebooks/03_advanced_correlations.ipynb`: **Cross-Domain Analysis**. Hunts for non-obvious correlations between lifestyle/demographics and chronic conditions.
-
+*   `notebooks/01_eda_template.ipynb`: **Data Integrity & Health Signals**. Check if the file contains valid health/cognition data, preprocess it, train the model, and analyze the results.
 ---
 
 ## 🛠️ Local API Setup (Prediction Service)
