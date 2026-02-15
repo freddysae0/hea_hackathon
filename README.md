@@ -10,8 +10,8 @@ This project aims to detect early health risks using longitudinal data from the 
 To reproduce the analysis or run the feature extraction notebooks, you must set up the data in Google Drive.
 
 ### 1. Data Setup
-1.  Download the **HRS 2022 Fat File** (`h22e3a.csv`).
-2.  Upload it to your Google Drive in the root folder or a specific `data/raw/` folder.
+1.  Download the **RAND HRS Longitudinal File 2022** (`randhrs1992_2022v1.dta`).
+2.  Upload it to your Google Drive in the root folder.
 3.  Mount Drive in Colab when prompted by the notebooks.
 
 ### 2. Notebooks
