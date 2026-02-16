@@ -16,8 +16,10 @@ app = FastAPI(
 origins = [
     "http://localhost:3000",
     "http://localhost:8001",
+    "http://localhost:5173",
     "https://altair-hackathon.web.app",
     "https://altair-hackathon.firebaseapp.com",
+    "https://back.redblock.online",
 ]
 
 app.add_middleware(
